@@ -1,0 +1,15 @@
+# Dockerfile.chromium
+FROM debian:bullseye
+
+RUN apt-get update && apt-get install -y \
+  chromium \
+  xvfb \
+  xauth \
+  curl \
+  procps \
+  --no-install-recommends && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
+
+# Запускаем Chromium через xvfb
+CMD ["xvfb-run", "--auto-servernum", "--", "chromium", "--headless", "--no-sandbox", "--disable-gpu", "--remote-debugging-port=9222", "http://projector-backend:3000/static/test-page.html"]
