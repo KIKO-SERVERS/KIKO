@@ -25,7 +25,7 @@ services:
       - "5000:5000"
     environment:
       - MODEL_ID=TinyLlama/TinyLlama-1.1B-Chat-v1.0  # Очень легкая модель (1.1B параметров)
-#      - QUANTIZE=bitsandbytes-nf4  # Квантование для уменьшения нагрузки
+      - QUANTIZE=bitsandbytes-nf4  # Квантование для уменьшения нагрузки
       - MAX_INPUT_LENGTH=1024
       - MAX_TOTAL_TOKENS=2048
     volumes:
