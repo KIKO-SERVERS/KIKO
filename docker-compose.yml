@@ -6,7 +6,7 @@ services:
     container_name: projector_nest
     restart: unless-stopped
     ports:
-      - "3008:3000"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - AI_SERVICE_URL=http://ai-model:5000/generate  # URL для обращения к модели ИИ
@@ -22,7 +22,7 @@ services:
     container_name: projector_ai
     restart: unless-stopped
     ports:
-      - "5001:5000"
+      - "5000:5000"
     environment:
       - MODEL_ID=TinyLlama/TinyLlama-1.1B-Chat-v1.0  # Очень легкая модель (1.1B параметров)
 #      - QUANTIZE=bitsandbytes-nf4  # Квантование для уменьшения нагрузки
