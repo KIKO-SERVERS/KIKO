@@ -10,6 +10,7 @@ services:
     environment:
       - NODE_ENV=production
       - AI_SERVICE_URL=http://ai-model:5000/generate  # URL для обращения к модели ИИ
+      - LOG_LEVEL=simple  # Уровень логирования
     volumes:
       - .:/app
       - /app/node_modules
