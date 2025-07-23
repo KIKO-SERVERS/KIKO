@@ -18,6 +18,7 @@ services:
 
   ai-model:
     image: ghcr.io/huggingface/text-generation-inference:1.1.0
+    platform: linux/amd64
     container_name: projector_ai
     restart: unless-stopped
     ports:
