@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   projector-backend:
     build: .
@@ -10,30 +8,58 @@ services:
     environment:
       - NODE_ENV=production
       - AI_SERVICE_URL=http://ai-model:5000/generate  # URL для обращения к модели ИИ
-    volumes:
-      - .:/app
-      - /app/node_modules
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
     depends_on:
       - ai-model
+    networks:
+      - ai-net
 
   ai-model:
     image: ghcr.io/huggingface/text-generation-inference:1.1.0
-    container_name: projector_ai
+    container_name: ai-model
     restart: unless-stopped
     ports:
       - "5000:5000"
-    environment:
-      - MODEL_ID=TinyLlama/TinyLlama-1.1B-Chat-v1.0  # Очень легкая модель (1.1B параметров)
-      - QUANTIZE=bitsandbytes-nf4  # Квантование для уменьшения нагрузки
-      - MAX_INPUT_LENGTH=1024
-      - MAX_TOTAL_TOKENS=2048
+    command:
+      - "--model-id"
+      - "tiiuae/falcon-rw-1b"
+      - "--max-input-length"
+      - "128"
+      - "--max-total-tokens"
+      - "512"
+      - "--max-batch-prefill-tokens"
+      - "128"
+      - "--disable-custom-kernels"
+      - "--port"
+      - "5000"
+
+   
     volumes:
       - ai-model-cache:/data  # Кэширование модели для ускорения последующих запусков
+    runtime: nvidia
     deploy:
       resources:
         limits:
           cpus: '2'  # Ограничиваем использование CPU
           memory: 4G  # Ограничиваем память
-
+    networks:
+      - ai-net
+  speech-api:
+    build: ./python-services/speech-api
+    container_name: speech-api
+    ports:
+      - "8000:8000"
+    environment:
+      - AI_SERVICE_URL=http://ai-model:5000/generate
+    depends_on:
+      - ai-model
+    networks:
+      - ai-net
+    
 volumes:
   ai-model-cache:
+
+networks:
+  ai-net:

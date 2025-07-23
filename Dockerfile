@@ -14,10 +14,9 @@ FROM node:20
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install --only=production
-
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY package*.json ./
 
 EXPOSE 3000
 
