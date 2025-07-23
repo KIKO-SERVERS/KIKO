@@ -8,6 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger,
   });
+
+  app.use('/static', express.static('/app/static'));
+
   await app.listen(3000);
 }
 bootstrap();

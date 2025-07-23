@@ -14,10 +14,11 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    depends_on:
-      - ai-model
+    # depends_on:
+    #   - ai-model
 
   ai-model:
+    platform: linux/amd64
     image: ghcr.io/huggingface/text-generation-inference:1.1.0
     platform: linux/amd64
     container_name: projector_ai
@@ -26,7 +27,7 @@ services:
       - "5001:5000"
     environment:
       - MODEL_ID=TinyLlama/TinyLlama-1.1B-Chat-v1.0  # Очень легкая модель (1.1B параметров)
-#      - QUANTIZE=bitsandbytes-nf4  # Квантование для уменьшения нагрузки
+      - QUANTIZE=bitsandbytes-nf4  # Квантование для уменьшения нагрузки
       - MAX_INPUT_LENGTH=1024
       - MAX_TOTAL_TOKENS=2048
     volumes:
@@ -36,6 +37,17 @@ services:
         limits:
           cpus: '2'  # Ограничиваем использование CPU
           memory: 4G  # Ограничиваем память
+    
+  chromium:
+    build:
+      context: .
+      dockerfile: Dockerfile.chromium
+    container_name: projector_chromium
+    depends_on:
+      - projector-backend
+    restart: unless-stopped
+    environment:
+      - DISPLAY=:99
 
 volumes:
   ai-model-cache:
