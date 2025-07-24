@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   projector-backend:
     build:
-      context: ./backend
+      context: ./server
       dockerfile: Dockerfile
     container_name: projector_nest
     restart: unless-stopped
@@ -14,7 +12,7 @@ services:
       - AI_SERVICE_URL=http://ai-model:5000/generate
       - LOG_LEVEL=simple
     volumes:
-      - ./backend:/app
+      - ./server:/app
       - /app/node_modules
 
   ai-model:
@@ -39,7 +37,7 @@ services:
 
   chromium:
     build:
-      context: ./backend
+      context: ./server
       dockerfile: Dockerfile.chromium
     container_name: projector_chromium
     depends_on:
