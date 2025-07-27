@@ -15,6 +15,9 @@ services:
   projector-backend:
     build:
       context: ./server  # This matches your actual folder name
+
+      context: ./server
+
       dockerfile: Dockerfile
     container_name: projector_nest
     restart: unless-stopped
