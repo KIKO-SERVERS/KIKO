@@ -1,12 +1,28 @@
 services:
+  client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: projector_frontend
+    restart: unless-stopped
+    ports:
+      - '4000:3000'
+    depends_on:
+      - projector-backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://projector-backend:5000
+
   projector-backend:
     build:
+      context: ./server  # This matches your actual folder name
+
       context: ./server
+
       dockerfile: Dockerfile
     container_name: projector_nest
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - '5000:3000'
     environment:
       - NODE_ENV=production
       - AI_SERVICE_URL=http://ai-model:5000/generate

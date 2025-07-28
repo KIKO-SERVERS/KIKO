@@ -1,24 +1,14 @@
-# Stage 1: Build
-FROM node:20 AS builder
-
+FROM node:20
 WORKDIR /app
 
+# Copy package files first for better caching
 COPY package*.json ./
+
+# Install all dependencies (including devDependencies)
 RUN npm install
 
+# Copy all source files
 COPY . .
-RUN npm run build
 
-# Stage 2: Run
-FROM node:20
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm install --only=production
-
-COPY --from=builder /app/dist ./dist
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
+# Skip TypeScript build and run in dev mode directly
+CMD ["npm", "run", "start:dev"]
