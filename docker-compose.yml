@@ -19,11 +19,12 @@ services:
     container_name: projector_nest
     restart: unless-stopped
     ports:
-      - '5000:3000'
+      - '5003:3000'
     environment:
       - NODE_ENV=production
       - AI_SERVICE_URL=http://ai-model:5000/generate
       - LOG_LEVEL=simple
+      - FFMPEG_PATH=/usr/bin/ffmpeg
     volumes:
       - ./server:/app
       - /app/node_modules

@@ -1,69 +1,100 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { CameraConfig, Stream } from './interfaces/camera.interface';
-import { AudioStream } from '../audio/interfaces/audio.interface';
-import path from 'path';
-import fs from 'fs';
-import { Readable } from 'stream';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import * as ffmpeg from 'fluent-ffmpeg';
+import { WhisperService } from '../whisper/whisper.service';
 
 @Injectable()
 export class CameraService {
   private readonly logger = new Logger(CameraService.name);
-  private config: CameraConfig;
+  private isMicrophoneEnabled = false;
 
-  constructor(private configService: ConfigService) {
-    this.config = {
-      ip: this.configService.get<string>('CAMERA_IP'),
-      port: this.configService.get<number>('CAMERA_PORT'),
-      username: this.configService.get<string>('CAMERA_USERNAME'),
-      password: this.configService.get<string>('CAMERA_PASSWORD'),
-      protocol: this.configService.get<'http' | 'https'>('CAMERA_PROTOCOL'),
-    };
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly whisperService: WhisperService,
+  ) {}
+
+  async enableMicrophone(cameraIp: string, credentials: string): Promise<void> {
+    try {
+      const auth = Buffer.from(credentials).toString('base64');
+      
+      // Включение микрофона через API камеры
+      await firstValueFrom(
+        this.httpService.post(
+          `http://${cameraIp}/cgi-bin/audio.cgi?action=start`,
+          {},
+          { headers: { Authorization: `Basic ${auth}` } },
+        ),
+      );
+
+      this.isMicrophoneEnabled = true;
+      this.logger.log('Микрофон включен');
+
+      // Запуск обработки аудиопотока
+      this.processAudioStream(cameraIp, credentials);
+    } catch (error) {
+      this.logger.error('Ошибка включения микрофона', error);
+      throw error;
+    }
   }
 
-  async getAudioVideoStream(): Promise<Stream> {
-    this.logger.log('Getting audio/video stream from camera');
-    // Implement actual stream fetching logic here
-    return {
-      audio: this.mockAudioStream(),
-      video: this.mockVideoStream(),
-    };
+  async disableMicrophone(cameraIp: string, credentials: string): Promise<void> {
+    try {
+      const auth = Buffer.from(credentials).toString('base64');
+      
+      await firstValueFrom(
+        this.httpService.post(
+          `http://${cameraIp}/cgi-bin/audio.cgi?action=stop`,
+          {},
+          { headers: { Authorization: `Basic ${auth}` } },
+        ),
+      );
+
+      this.isMicrophoneEnabled = false;
+      this.logger.log('Микрофон выключен');
+    } catch (error) {
+      this.logger.error('Ошибка выключения микрофона', error);
+      throw error;
+    }
   }
 
-  async getAudioStream(): Promise<AudioStream> {
-    const stream = await this.getAudioVideoStream();
-    return this.extractAudioFromStream(stream);
+  async getMicrophoneStatus(cameraIp: string, credentials: string): Promise<any> {
+    const auth = Buffer.from(credentials).toString('base64');
+    const response = await firstValueFrom(
+      this.httpService.get(
+        `http://${cameraIp}/cgi-bin/configManager.cgi?action=getConfig&name=AudioEncode`,
+        { headers: { Authorization: `Basic ${auth}` } },
+      ),
+    );
+    return response.data;
   }
 
-  async stopAudioStream(): Promise<void> {
-    this.logger.log('Stopping audio stream');
-    // Implement actual stop logic here
-  }
+  private processAudioStream(cameraIp: string, credentials: string): void {
+    const auth = Buffer.from(credentials).toString('base64');
+    const rtspUrl = `rtsp://${credentials.split(':')[0]}:${credentials.split(':')[1]}@${cameraIp}/stream=1`;
 
-  extractAudioFromStream(stream: Stream): AudioStream {
-    this.logger.log('Extracting audio from stream');
-    return {
-      stream: stream.audio,
-      format: 'PCM',
-      sampleRate: 16000,
-    };
-  }
-
-  private mockAudioStream(): Readable {
-    const testFilePath = path.resolve(process.cwd(), 'src', 'testFiles', 'harvard.wav');
-    return fs.createReadStream(testFilePath);
-  }
-
-  // private mockVideoStream(): Readable {
-  //   const filePath = path.resolve(process.cwd(), 'src', 'testFiles', 'mp4.MP4');
-  //   return fs.createReadStream(filePath);
-  // }
-
-  private mockVideoStream(): Readable {
-    return new Readable({
-      read() {
-        this.push(null); // сразу завершает поток
-      }
-    });
+    ffmpeg()
+      .input(rtspUrl)
+      .inputOptions([
+        '-rtsp_transport tcp',
+        '-timeout 5000000',
+        '-re',
+      ])
+      .audioCodec('pcm_s16le')
+      .audioChannels(1)
+      .audioFrequency(16000)
+      .format('s16le')
+      .on('error', (err) => {
+        this.logger.error('Ошибка обработки аудиопотока', err);
+      })
+      .pipe()
+      .on('data', async (chunk) => {
+        try {
+          const transcription = await this.whisperService.transcribe(chunk);
+          this.logger.log(`Транскрипция: ${transcription}`);
+        } catch (error) {
+          this.logger.error('Ошибка транскрипции', error);
+        }
+      });
   }
 }
