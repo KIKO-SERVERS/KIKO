@@ -9,6 +9,7 @@ RUN npm install
 
 # Copy all source files
 COPY . .
+RUN apt-get update && apt-get install -y ffmpeg
 
 # Skip TypeScript build and run in dev mode directly
 CMD ["npm", "run", "start:dev"]
