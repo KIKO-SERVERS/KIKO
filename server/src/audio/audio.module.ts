@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
-import { CameraModule } from '../camera/camera.module';
+import { AudioController } from './audio.controller';
+import { CameraService } from '../camera/camera.service';
 
 @Module({
-  imports: [CameraModule],
+  providers: [AudioService, CameraService],
   controllers: [AudioController],
-  providers: [AudioService],
   exports: [AudioService],
 })
 export class AudioModule {}
