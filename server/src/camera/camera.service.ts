@@ -126,15 +126,29 @@ export class CameraService {
     }
   }
 
+  // src/camera/camera.service.ts
   async processAudio(cameraIp: string, credentials: string): Promise<void> {
     const { stream } = await this.getAudioStream(cameraIp, credentials);
+    const audioChunks: Buffer[] = [];
+    let processing = false;
 
     stream.on('data', async (chunk: Buffer) => {
-      try {
-        const transcription = await this.whisperService.transcribe(chunk);
-        this.logger.log(`Транскрипция: ${transcription}`);
-      } catch (error) {
-        this.logger.error('Ошибка транскрипции', error);
+      audioChunks.push(chunk);
+
+      if (!processing && audioChunks.length > 10) {
+        processing = true;
+        const audioBuffer = Buffer.concat(audioChunks);
+        audioChunks.length = 0;
+
+        try {
+          const transcription =
+            await this.whisperService.transcribe(audioBuffer);
+          this.logger.log(`Транскрипция: ${transcription}`);
+        } catch (error) {
+          this.logger.error('Transcription error:', error);
+        } finally {
+          processing = false;
+        }
       }
     });
   }
