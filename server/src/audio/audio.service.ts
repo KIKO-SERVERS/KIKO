@@ -6,7 +6,9 @@ import { AudioStream, AudioStatus } from './interfaces/audio.interface';
 export class AudioService {
   private readonly logger = new Logger(AudioService.name);
   private microphoneEnabled = false;
-  private audioStream: AudioStream | null = null;
+  private audioStream: AudioStream = null;
+  private readonly cameraIp = '192.168.1.100'; // Замените на IP вашей камеры
+  private readonly credentials = 'admin:123456'; // Замените на реальные credentials
 
   constructor(private readonly cameraService: CameraService) {}
 
@@ -14,11 +16,14 @@ export class AudioService {
     if (!this.microphoneEnabled) {
       throw new Error('Microphone is disabled');
     }
-    
+
     if (!this.audioStream) {
-      this.audioStream = await this.cameraService.getAudioStream();
+      this.audioStream = await this.cameraService.getAudioStream(
+        this.cameraIp,
+        this.credentials,
+      );
     }
-    
+
     return this.audioStream;
   }
 

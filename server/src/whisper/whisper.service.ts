@@ -15,7 +15,6 @@ export class WhisperService {
           audio_data: audioData.toString('base64'),
         }),
       );
-
       return response.data.text;
     } catch (error) {
       this.logger.error('Ошибка транскрипции через Whisper', error);

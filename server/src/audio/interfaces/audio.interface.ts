@@ -1,7 +1,12 @@
+import { Readable } from 'stream';
+
 export interface AudioStream {
-  stream: any; // Replace with actual stream type
-  format: string;
-  sampleRate: number;
+  stream: Readable;
+  metadata: {
+    codec: string;
+    sampleRate: number;
+    channels: number;
+  };
 }
 
 export interface AudioStatus {
