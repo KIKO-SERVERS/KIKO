@@ -16,7 +16,7 @@ import { AudioModule } from './audio/audio.module';
       isGlobal: true,
       load: [configuration],
     }),
-    // SpeechModule, 
+    // SpeechModule,
     LoggerModule,
     TranscriptionModule,
     CameraModule,

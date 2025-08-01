@@ -14,7 +14,10 @@ export class AiController {
         inputs: prompt,
       });
 
-      const reply = data.generated_text || data.outputs?.[0]?.generated_text || '[empty response]';
+      const reply =
+        data.generated_text ||
+        data.outputs?.[0]?.generated_text ||
+        '[empty response]';
 
       return { response: reply };
     } catch (error) {

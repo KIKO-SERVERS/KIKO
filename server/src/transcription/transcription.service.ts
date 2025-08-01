@@ -1,9 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CameraService } from '../camera/camera.service';
 import { WhisperService } from './whisper/whisper.service';
-import * as fs from 'fs'; 
-import { promises as fsPromises } from 'fs';
-import * as os from 'os';
+import * as fs from 'fs';
 import * as path from 'path';
 
 @Injectable()
@@ -24,7 +22,12 @@ export class TranscriptionService implements OnModuleInit {
 
     try {
       // Для теста — берём тестовый файл из src/testFiles
-      const testFile = path.resolve(process.cwd(), 'src', 'testFiles', 'harvard.wav');
+      const testFile = path.resolve(
+        process.cwd(),
+        'src',
+        'testFiles',
+        'harvard.wav',
+      );
 
       if (!fs.existsSync(testFile)) {
         this.logger.error(`Test audio file not found: ${testFile}`);
@@ -60,9 +63,10 @@ export class TranscriptionService implements OnModuleInit {
 
       await fsPromises.unlink(tmpFilePath);
       */
-
     } catch (error) {
-      this.logger.error(`Failed to start transcription: ${error.stack || error.message || error}`);
+      this.logger.error(
+        `Failed to start transcription: ${error.stack || error.message || error}`,
+      );
     }
   }
 }
