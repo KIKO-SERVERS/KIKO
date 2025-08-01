@@ -13,8 +13,9 @@ async function bootstrap() {
 
   // Start transcription automatically
   const transcriptionService = app.get(TranscriptionService);
-  await transcriptionService.startTranscription()
-    .catch(err => logger.error('Failed to start transcription', err));
+  await transcriptionService
+    .startTranscription()
+    .catch((err) => logger.error('Failed to start transcription', err));
 
   app.use('/static', express.static('/app/static'));
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));

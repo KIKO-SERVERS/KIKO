@@ -8,4 +8,4 @@ import { CameraModule } from '../camera/camera.module';
   providers: [TranscriptionService, WhisperService],
   exports: [TranscriptionService],
 })
-export class TranscriptionModule {} 
+export class TranscriptionModule {}

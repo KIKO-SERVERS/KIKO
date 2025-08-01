@@ -5,7 +5,10 @@ import whisper from 'whisper-node';
 export class WhisperService {
   private readonly logger = new Logger(WhisperService.name);
 
-  async transcribe(audioPath: string, callback: (text: string) => void): Promise<void> {
+  async transcribe(
+    audioPath: string,
+    callback: (text: string) => void,
+  ): Promise<void> {
     this.logger.log(`Starting transcription of file: ${audioPath}`);
 
     try {
