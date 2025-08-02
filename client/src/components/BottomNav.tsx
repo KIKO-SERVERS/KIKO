@@ -5,7 +5,7 @@ import { FiHome, FiUser, FiMessageCircle, FiShield, FiLogIn } from "react-icons/
 const navStyle: React.CSSProperties = {
   position: 'fixed',
   left: 0, right: 0, bottom: 0,
-  height: 62,
+  height: 40,
   background: '#232040',
   display: 'flex',
   justifyContent: 'space-around',
