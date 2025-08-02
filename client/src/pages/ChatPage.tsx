@@ -36,13 +36,13 @@ const ChatPage = () => {
     <div style={{ maxWidth: 400, margin: '40px auto', padding: 12, background: '#232040', borderRadius: 18 }}>
       <h2 style={{ color: "#fff", textAlign: 'center', marginBottom: 12 }}>AI Chat</h2>
       <div style={{
-        minHeight: 220,
+        minHeight: 320,
         background: '#1B1833',
         borderRadius: 12,
         padding: 10,
         color: "#fff",
         marginBottom: 14,
-        maxHeight: 320,
+        maxHeight: 380,
         overflowY: 'auto'
       }}>
         {messages.map((msg, idx) => (

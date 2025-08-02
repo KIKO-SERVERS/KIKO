@@ -1,6 +1,9 @@
 import React from "react";
 import KikoHeader from "../components/KikoHeader";
 
+const userEmail = localStorage.getItem("userEmail");
+{userEmail && <span style={{ color: "#7e92ce", fontSize: 14, marginLeft: 8 }}>({userEmail})</span>}
+
 const HomePage = () => (
   <div className="kiko-card">
     <KikoHeader />
