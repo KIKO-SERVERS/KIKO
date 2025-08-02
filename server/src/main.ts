@@ -20,7 +20,7 @@ async function bootstrap() {
   app.use('/static', express.static('/app/static'));
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
 
-  await app.listen(3000);
+  await app.listen(3003);
   logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
