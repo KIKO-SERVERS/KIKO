@@ -3,6 +3,7 @@
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
+    "declarationDir": "./dist/types/server",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
@@ -21,7 +22,6 @@
   },
   "exclude": [
     "node_modules",
-    "whisper.cpp",
     "**/*.spec.ts",
     "**/*.test.ts"
   ]

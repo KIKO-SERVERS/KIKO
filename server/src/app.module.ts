@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { LoggerModule } from './logger/logger.module';
 import { AiController } from './ai.controller';
 import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 import configuration from './config/configuration';
 import { TranscriptionModule } from './transcription/transcription.module';
 import { CameraModule } from './camera/camera.module';
@@ -16,6 +17,7 @@ import { AudioModule } from './audio/audio.module';
       isGlobal: true,
       load: [configuration],
     }),
+    HttpModule,
     // SpeechModule,
     LoggerModule,
     TranscriptionModule,
